@@ -1,0 +1,12 @@
+let startDateTime = datetime('2020-03-16T11:33:00.000Z');
+let endDateTime = datetime('2020-04-01T12:03:17.013Z');
+let ContainerIdList = KubePodInventory
+| where ClusterName =~ 'TestAKSCluster'
+| distinct ContainerID;
+ContainerLog
+| where TimeGenerated >= startDateTime and TimeGenerated < endDateTime
+| where ContainerID in (ContainerIdList)
+| project LogEntrySource, LogEntry, TimeGenerated, Computer, Image, Name, ContainerID
+| order by TimeGenerated desc
+| render table
+| where LogEntry contains "Application is shutting down... " 
